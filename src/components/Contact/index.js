@@ -1,169 +1,128 @@
-import React from 'react'
-import styled from 'styled-components'
-import { useRef } from 'react';
-import emailjs from '@emailjs/browser';
-import { Snackbar } from '@mui/material';
+import { useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
+import { FaArrowRight, FaEnvelope } from "react-icons/fa";
+import { Bio, content } from "../../data/portfolio";
+import SectionHeading from "../SectionHeading";
 
-const Container = styled.div`
-display: flex;
-flex-direction: column;
-justify-content: center;
-position: relative;
-z-index: 1;
-align-items: center;
-@media (max-width: 960px) {
-    padding: 0px;
-}
-`
+export default function Contact() {
+  const formRef = useRef(null);
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSending, setIsSending] = useState(false);
 
-const Wrapper = styled.div`
-position: relative;
-display: flex;
-justify-content: space-between;
-align-items: center;
-flex-direction: column;
-width: 100%;
-max-width: 1350px;
-padding: 0px 0px 80px 0px;
-gap: 12px;
-@media (max-width: 960px) {
-    flex-direction: column;
-}
-`
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsSending(true);
+    setStatus({ type: "", message: "" });
 
-const Title = styled.div`
-font-size: 42px;
-text-align: center;
-font-weight: 600;
-margin-top: 20px;
-  color: ${({ theme }) => theme.text_primary};
-  @media (max-width: 768px) {
-      margin-top: 12px;
-      font-size: 32px;
-  }
-`;
-
-const Desc = styled.div`
-    font-size: 18px;
-    text-align: center;
-    max-width: 600px;
-    color: ${({ theme }) => theme.text_secondary};
-    @media (max-width: 768px) {
-        margin-top: 12px;
-        font-size: 16px;
-    }
-`;
-
-
-const ContactForm = styled.form`
-  width: 95%;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  background-color: ${({ theme }) => theme.card};
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: rgba(23, 92, 230, 0.15) 0px 4px 24px;
-  margin-top: 28px;
-  gap: 12px;
-`
-
-const ContactTitle = styled.div`
-  font-size: 24px;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.text_primary};
-`
-
-const ContactInput = styled.input`
-  flex: 1;
-  background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.text_secondary};
-  outline: none;
-  font-size: 18px;
-  color: ${({ theme }) => theme.text_primary};
-  border-radius: 12px;
-  padding: 12px 16px;
-  &:focus {
-    border: 1px solid ${({ theme }) => theme.primary};
-  }
-`
-
-const ContactInputMessage = styled.textarea`
-  flex: 1;
-  background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.text_secondary};
-  outline: none;
-  font-size: 18px;
-  color: ${({ theme }) => theme.text_primary};
-  border-radius: 12px;
-  padding: 12px 16px;
-  &:focus {
-    border: 1px solid ${({ theme }) => theme.primary};
-  }
-`
-
-const ContactButton = styled.input`
-  width: 100%;
-  text-decoration: none;
-  text-align: center;
-  background: hsla(271, 100%, 50%, 1);
-  background: linear-gradient(225deg, hsla(271, 100%, 50%, 1) 0%, hsla(294, 100%, 50%, 1) 100%);
-  background: -moz-linear-gradient(225deg, hsla(271, 100%, 50%, 1) 0%, hsla(294, 100%, 50%, 1) 100%);
-  background: -webkit-linear-gradient(225deg, hsla(271, 100%, 50%, 1) 0%, hsla(294, 100%, 50%, 1) 100%);
-  padding: 13px 16px;
-  margin-top: 2px;
-  border-radius: 12px;
-  border: none;
-  color: ${({ theme }) => theme.text_primary};
-  font-size: 18px;
-  font-weight: 600;
-`
-
-
-
-const Contact = () => {
-
-  //hooks
-  const [open, setOpen] = React.useState(false);
-  const form = useRef();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    emailjs.sendForm('service_lptjq1g', 'template_usxtgcq', form.current, 'gfFD7j_wymcAVXZ1Q')
-      .then((result) => {
-        setOpen(true);
-        form.current.reset();
-      }, (error) => {
-        console.log(error.text);
-      });
-  }
-
-
+    emailjs
+      .sendForm(
+        "service_lptjq1g",
+        "template_usxtgcq",
+        formRef.current,
+        "gfFD7j_wymcAVXZ1Q"
+      )
+      .then(() => {
+        setStatus({ type: "success", message: content.contact.sentMessage });
+        formRef.current.reset();
+      })
+      .catch((error) => {
+        console.error("EmailJS contact form submission failed:", error);
+        setStatus({
+          type: "error",
+          message: content.contact.errorMessage,
+        });
+      })
+      .finally(() => setIsSending(false));
+  };
 
   return (
-    <Container>
-      <Wrapper>
-        <Title>Contact</Title>
-        <Desc>Feel free to reach out to me for any questions or opportunities!</Desc>
-        <ContactForm ref={form} onSubmit={handleSubmit}>
-          <ContactTitle>Email Me 🚀</ContactTitle>
-          <ContactInput required placeholder="Your Email" name="from_email" />
-          <ContactInput required placeholder="Your Name" name="from_name" />
-          <ContactInput required placeholder="Subject" name="subject" />
-          <ContactInputMessage required placeholder="Message" rows="4" name="message" />
-          <ContactButton type="submit" value="Send" />
-        </ContactForm>
-        <Snackbar
-          open={open}
-          autoHideDuration={6000}
-          onClose={()=>setOpen(false)}
-          message="Email sent successfully!"
-          severity="success"
-        />
-      </Wrapper>
-    </Container>
-  )
-}
+    <section className="section-pad section-tint">
+      <div className="section-wrap grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+        <div>
+          <SectionHeading
+            eyebrow={content.contact.eyebrow}
+            title={content.contact.title}
+            description={content.contact.description}
+          />
+          <a
+            href={Bio.email}
+            className="inline-flex items-center gap-3 text-sm text-[var(--accent-strong)] transition hover:gap-4"
+          >
+            <FaEnvelope aria-hidden="true" />
+            {Bio.emailAddress}
+            <FaArrowRight aria-hidden="true" />
+          </a>
+        </div>
 
-export default Contact
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="glass-panel rounded-3xl p-5 sm:p-8"
+        >
+          <h3 className="mb-6 text-xl font-semibold">{content.contact.formTitle}</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-2 text-xs font-medium text-[var(--muted)]">
+              {content.contact.nameLabel}
+              <input
+                className="contact-field"
+                required
+                autoComplete="name"
+                placeholder={content.contact.namePlaceholder}
+                name="from_name"
+              />
+            </label>
+            <label className="grid gap-2 text-xs font-medium text-[var(--muted)]">
+              {content.contact.emailLabel}
+              <input
+                className="contact-field"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder={content.contact.emailPlaceholder}
+                name="from_email"
+              />
+            </label>
+          </div>
+          <label className="mt-4 grid gap-2 text-xs font-medium text-[var(--muted)]">
+            {content.contact.subjectLabel}
+            <input
+              className="contact-field"
+              required
+              placeholder={content.contact.subjectPlaceholder}
+              name="subject"
+            />
+          </label>
+          <label className="mt-4 grid gap-2 text-xs font-medium text-[var(--muted)]">
+            {content.contact.messageLabel}
+            <textarea
+              className="contact-field min-h-36 resize-y"
+              required
+              placeholder={content.contact.messagePlaceholder}
+              rows="5"
+              name="message"
+            />
+          </label>
+          <div className="mt-5 flex flex-wrap items-center gap-4">
+            <button type="submit" className="primary-button" disabled={isSending}>
+              {isSending
+                ? content.contact.sendingButton
+                : content.contact.sendButton}
+              <FaArrowRight aria-hidden="true" />
+            </button>
+            <p
+              className={`text-sm ${
+                status.type === "error"
+                  ? "text-red-500"
+                  : "text-[var(--accent-strong)]"
+              }`}
+              role="status"
+              aria-live="polite"
+            >
+              {status.message}
+            </p>
+          </div>
+        </form>
+      </div>
+    </section>
+  );
+}

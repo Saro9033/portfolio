@@ -1,106 +1,90 @@
+import { motion } from "framer-motion";
+import { FaBriefcase } from "react-icons/fa";
+import { content, experiences } from "../../data/portfolio";
+import SectionHeading from "../SectionHeading";
 
-import React from 'react'
-import styled from 'styled-components'
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineDot from '@mui/lab/TimelineDot';
-import ExperienceCard from '../Cards/ExperienceCard';
-import { experiences } from '../../data/constants';
-
-const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-    align-items: center;
-    padding: 40px 0px 80px 0px;
-    @media (max-width: 960px) {
-        padding: 0px;
-    }
-`;
-
-const Wrapper = styled.div`
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    max-width: 1350px;
-    padding: 80px 0;
-    gap: 12px;
-    @media (max-width: 960px) {
-        flex-direction: column;
-    }
-`;
-
-const Title = styled.div`
-font-size: 42px;
-text-align: center;
-font-weight: 600;
-margin-top: 20px;
-  color: ${({ theme }) => theme.text_primary};
-  @media (max-width: 768px) {
-      margin-top: 12px;
-      font-size: 32px;
-  }
-`;
-
-const Desc = styled.div`
-    font-size: 18px;
-    text-align: center;
-    max-width: 600px;
-    color: ${({ theme }) => theme.text_secondary};
-    @media (max-width: 768px) {
-        margin-top: 12px;
-        font-size: 16px;
-    }
-`;
-
-const TimelineSection = styled.div`
-    width: 100%;
-    max-width: 1000px;
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-`;
-
-
-
-const index = () => {
-    return (
-        <Container id="experience">
-            <Wrapper>
-                <Title>Visionary</Title>
-                <Desc>
-                    Launching My Career: A Fresh Perspective on Front-End Engineering
-                </Desc>
-                <TimelineSection>
-                    <Timeline>
-                        {experiences.map((experience,index) => (
-                            <TimelineItem>
-                                <TimelineSeparator>
-                                    <TimelineDot variant="outlined" color="secondary" />
-                                    {index !== experiences.length - 1 && <TimelineConnector style={{ background: '#854CE6' }} />}
-                                </TimelineSeparator>
-                                <TimelineContent sx={{ py: '12px', px: 2 }}>
-                                    <ExperienceCard experience={experience}/>
-                                </TimelineContent>
-                            </TimelineItem>
-                        ))}
-                    </Timeline>
-
-                </TimelineSection>
-            </Wrapper>
-        </Container>
-    )
+function updateSpotlight(event) {
+  const card = event.currentTarget;
+  const bounds = card.getBoundingClientRect();
+  const x = event.clientX - bounds.left;
+  const y = event.clientY - bounds.top;
+  const tiltX = ((y / bounds.height) * 2 - 1) * -1.5;
+  const tiltY = ((x / bounds.width) * 2 - 1) * 1.5;
+  card.style.setProperty("--mouse-x", `${x}px`);
+  card.style.setProperty("--mouse-y", `${y}px`);
+  card.style.setProperty("--tilt-x", `${tiltX}deg`);
+  card.style.setProperty("--tilt-y", `${tiltY}deg`);
+  card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-2px)`;
 }
 
-export default index
+function resetSpotlight(event) {
+  event.currentTarget.style.setProperty("--tilt-x", "0deg");
+  event.currentTarget.style.setProperty("--tilt-y", "0deg");
+  event.currentTarget.style.transform = "";
+}
+
+export default function Experience() {
+  return (
+    <section className="section-pad relative">
+      <div className="section-wrap">
+        <SectionHeading
+          eyebrow={content.experience.eyebrow}
+          title={content.experience.title}
+          description={content.experience.description}
+        />
+        <div className="relative space-y-5 pl-8 sm:pl-12">
+          <div
+            className="experience-track absolute bottom-8 left-[9px] top-8 w-px sm:left-[17px]"
+            aria-hidden="true"
+          />
+          {experiences.map((experience, index) => (
+            <motion.article
+              key={experience.id}
+              className="glass-panel spotlight-card rounded-3xl p-5 sm:p-7"
+              initial={{ opacity: 0, x: 18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.16 }}
+              transition={{ duration: 0.55, delay: index * 0.07 }}
+              onMouseMove={updateSpotlight}
+              onMouseLeave={resetSpotlight}
+            >
+              <span className="absolute -left-[31px] top-7 grid h-8 w-8 place-items-center rounded-full border border-[var(--line)] bg-[var(--page)] text-[var(--accent-strong)] sm:-left-[41px]">
+                <FaBriefcase className="text-xs" aria-hidden="true" />
+              </span>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="section-eyebrow mb-2">0{index + 1} / EXPERIENCE</p>
+                  <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">
+                    {experience.title}
+                  </h3>
+                </div>
+                <span className="rounded-full border border-[var(--line)] px-3 py-1 text-[0.62rem] uppercase tracking-wider text-[var(--subtle)]">
+                  {content.experience.cardLabel}
+                </span>
+              </div>
+              <p className="mt-4 max-w-4xl text-sm leading-7 text-[var(--muted)] sm:text-base">
+                {experience.description}
+              </p>
+              <div className="mt-5">
+                <p className="section-eyebrow mb-2">Tech stack</p>
+                <ul
+                  className="flex flex-wrap gap-2"
+                  aria-label={`${experience.title} technology stack`}
+                >
+                  {experience.stack.map((item) => (
+                    <li
+                      key={item}
+                      className="stack-chip rounded-full border border-[var(--line)] px-3 py-1.5 text-[0.7rem] font-medium text-[var(--muted)]"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

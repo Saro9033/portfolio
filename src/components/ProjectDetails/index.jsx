@@ -1,243 +1,136 @@
-import { CloseRounded, GitHub, LinkedIn } from '@mui/icons-material';
-import { Modal } from '@mui/material';
-import React from 'react'
-import styled from 'styled-components'
+import { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { FaExternalLinkAlt, FaGithub, FaTimes } from "react-icons/fa";
+import { content } from "../../data/portfolio";
 
-const Container = styled.div`
-width: 100%;
-height: 100%;
-position: absolute;
-top: 0;
-left: 0;
-background-color: #000000a7;
-display: flex;
-align-items: top;
-justify-content: center;
-overflow-y: scroll;
-transition: all 0.5s ease;
-`;
+export default function ProjectDetails({ project, onClose }) {
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
 
-const Wrapper = styled.div`
-max-width: 800px;
-width: 100%;
-border-radius: 16px;
-margin: 50px 12px;
-height: min-content;
-background-color: ${({ theme }) => theme.card};
-color: ${({ theme }) => theme.text_primary};
-padding: 20px;
-display: flex;
-flex-direction: column;
-position: relative;
-`;
+  useEffect(() => {
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
 
-const Title = styled.div`
-  font-size: 28px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.text_primary};
-  margin: 8px 6px 0px 6px;
-  @media only screen and (max-width: 600px) {
-      font-size: 24px;
-      margin: 6px 6px 0px 6px;
-  }
-`;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
 
-const Date = styled.div`
-    font-size: 16px;
-    margin: 2px 6px;
-    font-weight: 400;
-    color: ${({ theme }) => theme.text_secondary};
-    @media only screen and (max-width: 768px){
-        font-size: 12px;
-    }
-`
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll(
+        'a[href], button:not([disabled])'
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
 
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
 
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+      previousFocus?.focus?.();
+    };
+  }, [onClose]);
 
-const Desc = styled.div`
-    font-size: 16px;
-    font-weight: 400;
-    color: ${({ theme }) => theme.text_primary};
-    margin: 8px 6px;
-    @media only screen and (max-width: 600px) {
-        font-size: 14px;
-        margin: 6px 6px;
-    }
-`;
+  const links = [
+    { href: project.github, label: content.projects.sourceLabel, Icon: FaGithub },
+    { href: project.webapp, label: content.projects.liveLabel, Icon: FaExternalLinkAlt },
+    {
+      href: project.backendGithub,
+      label: content.projects.backendLabel,
+      Icon: FaGithub,
+    },
+    {
+      href: project.backendUrl,
+      label: content.projects.backendLiveLabel,
+      Icon: FaExternalLinkAlt,
+    },
+  ].filter((link) => link.href);
 
-const Image = styled.img`
-    width: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-top: 30px;
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3);
-`;
-
-const Label = styled.div`
-    font-size: 20px;
-    font-weight: 600;
-    color: ${({ theme }) => theme.text_primary};
-    margin: 8px 6px;
-    @media only screen and (max-width: 600px) {
-        font-size: 16px;
-        margin: 8px 6px;
-    }
-`;
-
-const Tags = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    margin: 8px 0px;
-    @media only screen and (max-width: 600px) {
-        margin: 4px 0px;
-    }
-`;
-
-const Tag = styled.div`
-    font-size: 14px;
-    font-weight: 400;
-    color: ${({ theme }) => theme.primary};
-    margin: 4px;
-    padding: 4px 8px;
-    border-radius: 8px;
-    background-color: ${({ theme }) => theme.primary + 20};
-    @media only screen and (max-width: 600px) {
-        font-size: 12px;
-    }
-`;
-
-const Members = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin: 12px 6px;
-    @media only screen and (max-width: 600px) {
-        margin: 4px 6px;
-    }
-`;
-
-const Member = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-`;
-
-const MemberImage = styled.img`
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 4px;
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3);
-    @media only screen and (max-width: 600px) {
-        width: 32px;
-        height: 32px;
-    }
-`;
-
-const MemberName = styled.div`
-    font-size: 16px;
-    font-weight: 500;
-    width: 200px;
-    color: ${({ theme }) => theme.text_primary};
-    @media only screen and (max-width: 600px) {
-        font-size: 14px;
-    }
-`;
-
-
-const ButtonGroup = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    margin: 12px 0px;
-    gap: 12px;
-`;
-
-const Button = styled.a`
-    width: 100%;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    color: ${({ theme }) => theme.text_primary};
-    padding: 12px 16px;
-    border-radius: 8px;
-    background-color: ${({ theme }) => theme.primary};
-    ${({ dull, theme }) => dull && `
-        background-color: ${theme.bgLight};
-        color: ${theme.text_secondary};
-        &:hover {
-            background-color: ${({ theme }) => theme.bg + 99};
-        }
-    `}
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.5s ease;
-    &:hover {
-        background-color: ${({ theme }) => theme.primary + 99};
-    }
-    @media only screen and (max-width: 600px) {
-        font-size: 12px;
-    }
-`;
-
-
-const index = ({ openModal, setOpenModal }) => {
-    const project = openModal?.project;
-    return (
-        <Modal open={true} onClose={() => setOpenModal({ state: false, project: null })}>
-            <Container>
-                <Wrapper>
-                    <CloseRounded
-                        style={{
-                            position: "absolute",
-                            top: "10px",
-                            right: "20px",
-                            cursor: "pointer",
-                        }}
-                        onClick={() => setOpenModal({ state: false, project: null })}
-                    />
-                    <Image src={project?.image} />
-                    <Title>{project?.title}</Title>
-                    <Date>{project.date}</Date>
-                    <Tags>
-                        {project?.tags.map((tag) => (
-                            <Tag>{tag}</Tag>
-                        ))}
-                    </Tags>
-                    <Desc>{project?.description}</Desc>
-                    {project.member && (
-                        <>
-                            <Label>Members</Label>
-                            <Members>
-                                {project?.member.map((member) => (
-                                    <Member>
-                                        <MemberImage src={member.img} />
-                                        <MemberName>{member.name}</MemberName>
-                                        <a href={member.github} target="new" style={{textDecoration: 'none', color: 'inherit'}}>
-                                            <GitHub />
-                                        </a>
-                                        <a href={member.linkedin} target="new" style={{textDecoration: 'none', color: 'inherit'}}>
-                                            <LinkedIn />
-                                        </a>
-                                    </Member>
-                                ))}
-                            </Members>
-                        </>
-                    )}
-                    <ButtonGroup>
-                        <Button dull href={project?.github} target='new'>View Code</Button>
-                        <Button href={project?.webapp} target='new'>View Live App</Button>
-                    </ButtonGroup>
-                    <ButtonGroup>
-                        <Button style={{display:!project.backendGithub ? "none" : '' }} dull href={project?.backendGithub} target='new'>View Backend Code</Button>
-                        <Button style={{display:!project.backendUrl ? "none" : '' }} href={project?.backendUrl} target='new'>View Backend Live App</Button>
-                    </ButtonGroup>
-                </Wrapper>
-            </Container>
-
-        </Modal>
-    )
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-3 backdrop-blur-md sm:p-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        role="presentation"
+      >
+        <motion.div
+          ref={dialogRef}
+          className="glass-panel relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-3xl p-5 shadow-2xl sm:p-8"
+          initial={{ opacity: 0, y: 18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 10, scale: 0.98 }}
+          transition={{ duration: 0.24 }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="project-dialog-title"
+          tabIndex="-1"
+        >
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full border border-[var(--line)] bg-[var(--panel-solid)] text-[var(--muted)] transition hover:text-[var(--text)]"
+            onClick={onClose}
+            aria-label={content.projects.dialogCloseLabel}
+          >
+            <FaTimes aria-hidden="true" />
+          </button>
+          <img
+            src={project.image}
+            alt={`${project.title} project preview`}
+            className="mb-6 aspect-[1.8] w-full rounded-2xl object-cover"
+          />
+          <p className="section-eyebrow">{project.category}</p>
+          <h2
+            id="project-dialog-title"
+            className="pr-10 text-2xl font-semibold tracking-tight sm:text-3xl"
+          >
+            {project.title}
+          </h2>
+          <p className="mt-4 whitespace-pre-line text-sm leading-7 text-[var(--muted)] sm:text-base">
+            {project.description}
+          </p>
+          <ul className="mt-5 flex flex-wrap gap-2" aria-label="Project technologies">
+            {project.tags.map((tag) => (
+              <li
+                key={tag}
+                className="rounded-full border border-[var(--line)] bg-[var(--page-raised)] px-3 py-1.5 text-xs text-[var(--muted)]"
+              >
+                {tag}
+              </li>
+            ))}
+          </ul>
+          {links.length > 0 && (
+            <div className="mt-7 flex flex-wrap gap-3 border-t border-[var(--line)] pt-5">
+              {links.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="secondary-button !min-h-10 !px-4 !text-xs"
+                >
+                  <Icon aria-hidden="true" />
+                  {label}
+                </a>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
 }
-
-export default index

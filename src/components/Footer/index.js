@@ -1,114 +1,57 @@
-import styled from 'styled-components';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import { Bio } from '../../data/constants';
+import { Link } from "react-scroll";
+import { FaGithub, FaLinkedinIn, FaPhone, FaWhatsapp } from "react-icons/fa";
+import { Bio, content, navigation } from "../../data/portfolio";
 
-const FooterContainer = styled.div`
-  width: 100%;
-  padding: 2rem 0;
-  display: flex;
-  justify-content: center;
-  //background: linear-gradient(100.26deg, rgba(0, 102, 255, 0.05) 42.33%, rgba(150, 0, 225, 0.05) 127.07%);
-`;
+const socialLinks = [
+  { label: "GitHub", href: Bio.github, Icon: FaGithub, external: true },
+  { label: "LinkedIn", href: Bio.linkedin, Icon: FaLinkedinIn, external: true },
+  { label: "WhatsApp", href: Bio.whatsapp, Icon: FaWhatsapp, external: true },
+  { label: "Call", href: Bio.call, Icon: FaPhone },
+];
 
-
-const FooterWrapper = styled.footer`
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
-  padding: 1rem;
-  color: ${({ theme }) => theme.text_primary};
-`;
-
-const Logo = styled.h1`
-  font-weight: 600;
-  font-size: 20px;
-  color: ${({ theme }) => theme.primary};
-`;
-
-const Nav = styled.nav`
-  width: 100%;
-  max-width: 800px;
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  justify-content: center;
-  @media (max-width: 768px) {
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-    text-align: center;
-    font-size: 12px;
-  }
-`;
-
-const NavLink = styled.a`
-color: ${({ theme }) => theme.text_primary};
-  text-decoration: none;
-  font-size: 1.2rem;
-  transition: color 0.2s ease-in-out;
-  &:hover {
-    color: ${({ theme }) => theme.primary};
-  }
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-`;
-
-const SocialMediaIcons = styled.div`
-  display: flex;
-  margin-top: 1rem;
-`;
-
-const SocialMediaIcon = styled.a`
-  display: inline-block;
-  margin: 0 1rem;
-  font-size: 1.5rem;
-  color: ${({ theme }) => theme.text_primary};
-  transition: color 0.2s ease-in-out;
-  &:hover {
-    color: ${({ theme }) => theme.primary};
-  }
-`;
-
-const Copyright = styled.p`
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: ${({ theme }) => theme.soft2};
-  text-align: center;
-`;
-
-function Footer() {
+export default function Footer() {
   return (
-    <FooterContainer>
-      <FooterWrapper>
-        <Logo>SARAVANAN</Logo>
-        <Nav>
-          <NavLink href="#about">About</NavLink>
-          <NavLink href="#skills">Skills</NavLink>
-          <NavLink href="#experience">Visionary</NavLink>
-          <NavLink href="#projects">Projects</NavLink>
-          <NavLink href="#education">Education</NavLink>
-        </Nav>
-        <SocialMediaIcons>
-          <SocialMediaIcon href={Bio.email} target="display"><EmailIcon /></SocialMediaIcon>
-          <SocialMediaIcon href={Bio.whatsapp} target="display"><WhatsAppIcon /></SocialMediaIcon>
-          <SocialMediaIcon href={Bio.linkedin} target="display"><LinkedInIcon /></SocialMediaIcon>
-          <SocialMediaIcon href={Bio.call} target="display"><PhoneIcon /></SocialMediaIcon>
-        </SocialMediaIcons>
-        <Copyright>
-          &copy; 2024 All rights reserved.
-        </Copyright>
-
-      </FooterWrapper>
-    </FooterContainer>
+    <footer className="border-t border-[var(--line)] py-10">
+      <div className="section-wrap flex flex-col items-center justify-between gap-7 md:flex-row">
+        <div className="text-center md:text-left">
+          <a href="#about" className="text-sm font-bold tracking-[0.14em]">
+            {Bio.name.toUpperCase()}
+          </a>
+          <p className="mt-2 text-xs text-[var(--subtle)]">{content.footer.tagline}</p>
+        </div>
+        <nav className="flex flex-wrap justify-center gap-x-5 gap-y-3" aria-label="Footer navigation">
+          {navigation.map(({ id, label }) => (
+            <Link
+              key={id}
+              to={id}
+              smooth
+              duration={500}
+              offset={-72}
+              className="cursor-pointer text-xs text-[var(--muted)] transition hover:text-[var(--text)]"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex gap-2">
+          {socialLinks.map(({ label, href, Icon, external }) => (
+            <a
+              key={label}
+              href={href}
+              className="social-link !h-9 !w-9 text-sm"
+              aria-label={label}
+              target={external ? "_blank" : undefined}
+              rel="noreferrer"
+            >
+              <Icon aria-hidden="true" />
+            </a>
+          ))}
+        </div>
+      </div>
+      <p className="mt-8 text-center text-[0.68rem] text-[var(--subtle)]">
+        &copy; {new Date().getFullYear()} {Bio.name}.{" "}
+        {content.footer.copyrightSuffix}
+      </p>
+    </footer>
   );
 }
-
-export default Footer;
