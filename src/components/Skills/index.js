@@ -41,7 +41,7 @@ const skillIcons = {
 function SkillCard({ group, index }) {
   return (
     <motion.article
-      className="glass-panel spotlight-card rounded-3xl p-6 sm:p-7"
+      className="glass-panel spotlight-card h-full rounded-3xl p-6 sm:p-7"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.18 }}
@@ -97,11 +97,11 @@ export default function Skills() {
           title={content.skills.title}
           description={content.skills.description}
         />
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid items-stretch gap-4 md:grid-cols-2">
           {skillGroups.map((group, index) => (
             <div
               key={group.title}
-              className={index === 2 ? "md:col-span-2" : ""}
+              className={`h-full ${index === 2 ? "md:col-span-2" : ""}`}
             >
               <SkillCard group={group} index={index} />
             </div>

@@ -7,6 +7,7 @@ import img5 from "../images/vimeo.jpg";
 import img6 from "../images/Linkup.jpg";
 import img7 from "../images/weatherio.jpg";
 import img8 from "../images/Telegraph.jpg";
+import imgEmailBot from "../images/email-bot.png";
 
 const emailAddress = "saravanan23official@gmail.com";
 
@@ -17,7 +18,7 @@ export const Bio = {
     "Full stack developer with 2+ years of experience building fast and reliable web applications, from idea to deployment. I enjoy trying new technologies and building small proof-of-concepts to test ideas before starting full development. I keep learning and improving my skills with every project. I work well in fast-paced teams and adapt quickly to change.",
   github: "https://github.com/Saro9033",
   resume:
-    "https://drive.google.com/file/d/17jYdzxyhB9IqWhxo5hQfFbfG6q6UJfi_/view?usp=drive_link",
+    "https://drive.google.com/file/d/14-Tq3UZmBl33wIEYXl17oaPzAFkMRujC/view?usp=drive_link",
   linkedin: "https://www.linkedin.com/in/saravanan2310/",
   call: "tel:+9042338199",
   whatsapp: "https://wa.me/919042338199",
@@ -66,6 +67,7 @@ export const content = {
       { label: "All", value: "all" },
       { label: "Web apps", value: "web app" },
       { label: "Landing pages", value: "landing page" },
+      { label: "AI bots", value: "ai bot" },
     ],
   },
   education: {
@@ -130,8 +132,7 @@ export const skillGroups = [
       { name: "Node.js", icon: "node" },
       { name: "Express.js", icon: "express" },
       { name: "MongoDB", icon: "database" },
-      { name: "PostgreSQL", icon: "database" },
-      { name: "Drizzle ORM", icon: "database" },
+      { name: "PostgreSQL - Drizzle ORM", icon: "database" },
       { name: "Webhooks", icon: "webhook" },
       { name: "Socket.io (Real-time apps)", icon: "realtime" },
     ],
@@ -158,7 +159,6 @@ export const experiences = [
       "Razorpay",
       "PayPal",
       "Zoho Books API",
-      "PDF invoices",
       "Email automation",
       "Strapi CMS",
       "SEO",
@@ -169,14 +169,14 @@ export const experiences = [
     title: "Ecommerce Platform",
     description:
       "Implemented a salesman delivery prioritization system that determines an efficient delivery order based on route efficiency, delivery priority, and the salesman's current location.",
-    stack: ["Route efficiency", "Priority scheduling", "Location-aware delivery"],
+    stack: ["Google Maps API", "Node.js", "Express.js", "MongoDB"],
   },
   {
     id: "school",
     title: "School Website",
     description:
       'Integrated a "Join Us" form that sends submissions and file attachments to an Outlook email. Built an email newsletter subscription flow that stores subscriber emails directly in a SharePoint Excel workbook.',
-    stack: ["Outlook", "File attachments", "SharePoint", "Excel", "Email newsletter"],
+    stack: ["Microsoft Graph API",  "SharePoint", "Outlook"],
   },
   {
     id: "dap",
@@ -189,16 +189,23 @@ export const experiences = [
       "SAML",
       "OIDC",
       "SCIM",
-      "WXT",
-      "Chrome",
-      "Edge",
-      "Firefox",
-      "Safari",
+      "WXT Framework",
     ],
   },
 ];
 
 export const projects = [
+  {
+    id: "ai-mail-bot",
+    title: "AI Mail Bot",
+    description:
+      "Supports natural-language email search, reading, summarizing, drafting, replying, and sending.\n\nUsers authenticate securely with Google OAuth 2.0, with tokens stored in MongoDB.\n\nSupports both OpenAI and Gemini as configurable AI providers with conversation history.\n\nThe watchdog automatically monitors unread Gmail, uses AI to classify messages into business categories, forwards matching emails to configured addresses, marks forwarded emails as read, and provides MongoDB-backed statistics and activity logs in a dashboard.",
+    image: imgEmailBot,
+    tags: ["Node.js", "Langchain", "Google OAuth", "MongoDB"],
+    category: "ai bot",
+    github: "https://github.com/Saro9033/mail-bot",
+    webapp: "https://mail-bot-0ynw.onrender.com/",
+  },
   {
     id: "dial-for-need",
     title: "Product Management and Delivery App",

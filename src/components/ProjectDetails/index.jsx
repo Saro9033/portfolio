@@ -88,11 +88,31 @@ export default function ProjectDetails({ project, onClose }) {
           >
             <FaTimes aria-hidden="true" />
           </button>
-          <img
-            src={project.image}
-            alt={`${project.title} project preview`}
-            className="mb-6 aspect-[1.8] w-full rounded-2xl object-cover"
-          />
+          {project.thumbnail === "ai-bot" ? (
+            <div
+              className="ai-bot-preview mb-6 aspect-[1.8]"
+              role="img"
+              aria-label="AI Mail Bot dashboard preview"
+            >
+              <div className="ai-bot-orb" aria-hidden="true" />
+              <div className="ai-bot-window">
+                <span className="ai-bot-dot ai-bot-dot-red" />
+                <span className="ai-bot-dot ai-bot-dot-yellow" />
+                <span className="ai-bot-dot ai-bot-dot-green" />
+                <div className="ai-bot-lines">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={project.image}
+              alt={`${project.title} project preview`}
+              className="mb-6 aspect-[1.8] w-full rounded-2xl object-fill"
+            />
+          )}
           <p className="section-eyebrow">{project.category}</p>
           <h2
             id="project-dialog-title"

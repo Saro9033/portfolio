@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaBriefcase } from "react-icons/fa";
 import { content, experiences } from "../../data/portfolio";
@@ -24,6 +25,8 @@ function resetSpotlight(event) {
 }
 
 export default function Experience() {
+  const [expanded, setExpanded] = useState({});
+
   return (
     <section className="section-pad relative">
       <div className="section-wrap">
@@ -63,8 +66,25 @@ export default function Experience() {
                 </span>
               </div>
               <p className="mt-4 max-w-4xl text-sm leading-7 text-[var(--muted)] sm:text-base">
-                {experience.description}
+                {expanded[experience.id] || experience.description.length <= 180
+                  ? experience.description
+                  : `${experience.description.slice(0, 180)}...`}
               </p>
+              {experience.description.length > 180 && (
+                <button
+                  type="button"
+                  className="mt-2 text-xs font-semibold text-[var(--accent-strong)]"
+                  onClick={() =>
+                    setExpanded((current) => ({
+                      ...current,
+                      [experience.id]: !current[experience.id],
+                    }))
+                  }
+                  aria-expanded={Boolean(expanded[experience.id])}
+                >
+                  {expanded[experience.id] ? "Read less" : "Read more"}
+                </button>
+              )}
               <div className="mt-5">
                 <p className="section-eyebrow mb-2">Tech stack</p>
                 <ul
@@ -74,7 +94,7 @@ export default function Experience() {
                   {experience.stack.map((item) => (
                     <li
                       key={item}
-                      className="stack-chip rounded-full border border-[var(--line)] px-3 py-1.5 text-[0.7rem] font-medium text-[var(--muted)]"
+                      className="stack-chip rounded-full border border-[var(--line)] px-3 py-1.5 text-[0.78rem] font-medium text-[var(--muted)]"
                     >
                       {item}
                     </li>

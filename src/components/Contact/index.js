@@ -3,11 +3,14 @@ import emailjs from "@emailjs/browser";
 import { FaArrowRight, FaEnvelope } from "react-icons/fa";
 import { Bio, content } from "../../data/portfolio";
 import SectionHeading from "../SectionHeading";
+import MagneticLink from "../MagneticLink";
 
 export default function Contact() {
   const formRef = useRef(null);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSending, setIsSending] = useState(false);
+  const [touched, setTouched] = useState({});
+  const [toastVisible, setToastVisible] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -24,6 +27,9 @@ export default function Contact() {
       .then(() => {
         setStatus({ type: "success", message: content.contact.sentMessage });
         formRef.current.reset();
+        setTouched({});
+        setToastVisible(true);
+        window.setTimeout(() => setToastVisible(false), 4000);
       })
       .catch((error) => {
         console.error("EmailJS contact form submission failed:", error);
@@ -34,6 +40,22 @@ export default function Contact() {
       })
       .finally(() => setIsSending(false));
   };
+
+  const validateField = (event) => {
+    setTouched((current) => ({
+      ...current,
+      [event.target.name]: event.target.validity.valid,
+    }));
+  };
+
+  const fieldClass = (name) =>
+    `contact-field ${
+      touched[name] === true
+        ? "!border-[var(--accent-strong)]"
+        : touched[name] === false
+        ? "!border-red-500"
+        : ""
+    }`;
 
   return (
     <section className="section-pad section-tint">
@@ -64,51 +86,60 @@ export default function Contact() {
             <label className="grid gap-2 text-xs font-medium text-[var(--muted)]">
               {content.contact.nameLabel}
               <input
-                className="contact-field"
                 required
                 autoComplete="name"
                 placeholder={content.contact.namePlaceholder}
                 name="from_name"
+                onBlur={validateField}
+                className={fieldClass("from_name")}
               />
             </label>
             <label className="grid gap-2 text-xs font-medium text-[var(--muted)]">
               {content.contact.emailLabel}
               <input
-                className="contact-field"
                 type="email"
                 required
                 autoComplete="email"
                 placeholder={content.contact.emailPlaceholder}
                 name="from_email"
+                onBlur={validateField}
+                className={fieldClass("from_email")}
               />
             </label>
           </div>
           <label className="mt-4 grid gap-2 text-xs font-medium text-[var(--muted)]">
             {content.contact.subjectLabel}
             <input
-              className="contact-field"
               required
               placeholder={content.contact.subjectPlaceholder}
               name="subject"
+              onBlur={validateField}
+              className={fieldClass("subject")}
             />
           </label>
           <label className="mt-4 grid gap-2 text-xs font-medium text-[var(--muted)]">
             {content.contact.messageLabel}
             <textarea
-              className="contact-field min-h-36 resize-y"
               required
               placeholder={content.contact.messagePlaceholder}
               rows="5"
               name="message"
+              onBlur={validateField}
+              className={`min-h-36 ${fieldClass("message")}`}
             />
           </label>
           <div className="mt-5 flex flex-wrap items-center gap-4">
-            <button type="submit" className="primary-button" disabled={isSending}>
+            <MagneticLink
+              as="button"
+              type="submit"
+              className="primary-button"
+              disabled={isSending}
+            >
               {isSending
                 ? content.contact.sendingButton
                 : content.contact.sendButton}
               <FaArrowRight aria-hidden="true" />
-            </button>
+            </MagneticLink>
             <p
               className={`text-sm ${
                 status.type === "error"
@@ -123,6 +154,12 @@ export default function Contact() {
           </div>
         </form>
       </div>
+      {toastVisible && (
+        <div className="contact-toast" role="status" aria-live="polite">
+          <span className="h-2 w-2 rounded-full bg-[var(--accent-strong)]" />
+          {content.contact.sentMessage}
+        </div>
+      )}
     </section>
   );
 }

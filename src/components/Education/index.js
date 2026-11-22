@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaGraduationCap } from "react-icons/fa";
 import { content, education } from "../../data/portfolio";
 import SectionHeading from "../SectionHeading";
 
 export default function Education() {
+  const [expanded, setExpanded] = useState({});
+
   return (
     <section className="section-pad">
       <div className="section-wrap">
@@ -31,9 +34,26 @@ export default function Education() {
               <p className="mt-4 inline-flex rounded-full border border-[var(--line)] px-3 py-1 text-xs text-[var(--accent-strong)]">
                 {item.grade}
               </p>
-              <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+              <p
+                className={`mt-4 text-sm leading-6 text-[var(--muted)] ${
+                  expanded[item.id] ? "" : "line-clamp-2"
+                }`}
+              >
                 {item.description}
               </p>
+              <button
+                type="button"
+                className="mt-2 text-xs font-semibold text-[var(--accent-strong)]"
+                onClick={() =>
+                  setExpanded((current) => ({
+                    ...current,
+                    [item.id]: !current[item.id],
+                  }))
+                }
+                aria-expanded={Boolean(expanded[item.id])}
+              >
+                {expanded[item.id] ? "Read less" : "Read more"}
+              </button>
             </motion.article>
           ))}
         </div>

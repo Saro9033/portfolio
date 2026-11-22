@@ -22,6 +22,8 @@ const Footer = lazy(() => import("./components/Footer"));
 
 function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
+  const [hoverType, setHoverType] = useState("");
+  const [pressed, setPressed] = useState(false);
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const smoothX = useSpring(x, { damping: 26, stiffness: 350, mass: 0.35 });
@@ -37,19 +39,46 @@ function CustomCursor() {
     const move = (event) => {
       x.set(event.clientX);
       y.set(event.clientY);
+      const target = event.target.closest(
+        "a, button, [role='button'], input, textarea, [data-cursor-view]"
+      );
+      setHoverType(
+        target?.matches("[data-cursor-view]")
+          ? "view"
+          : target
+          ? "interactive"
+          : ""
+      );
     };
+    const down = () => setPressed(true);
+    const up = () => setPressed(false);
     window.addEventListener("pointermove", move, { passive: true });
-    return () => window.removeEventListener("pointermove", move);
+    window.addEventListener("mousedown", down);
+    window.addEventListener("mouseup", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("mousedown", down);
+      window.removeEventListener("mouseup", up);
+    };
   }, [x, y]);
 
   if (!enabled) return null;
 
   return (
-    <motion.div
-      className="custom-cursor"
-      style={{ x: smoothX, y: smoothY }}
-      aria-hidden="true"
-    />
+    <>
+      <motion.div
+        className="custom-cursor-dot"
+        style={{ x, y }}
+        aria-hidden="true"
+      />
+      <motion.div
+        className={`custom-cursor-ring${hoverType ? ` cursor-${hoverType}` : ""}${pressed ? " cursor-pressed" : ""}`}
+        style={{ x: smoothX, y: smoothY }}
+        aria-hidden="true"
+      >
+        {hoverType === "view" && <span>View</span>}
+      </motion.div>
+    </>
   );
 }
 
@@ -60,6 +89,7 @@ function App() {
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const { scrollYProgress } = useScroll();
 
   useEffect(() => {
@@ -67,6 +97,20 @@ function App() {
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem("portfolio-theme", theme);
   }, [darkMode]);
+
+  useEffect(() => {
+    let frame;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setShowBackToTop(window.scrollY > 700));
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", update);
+    };
+  }, []);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -111,6 +155,20 @@ function App() {
               />
             </Suspense>
           )}
+          <motion.button
+            type="button"
+            className="back-to-top"
+            aria-label="Back to top"
+            initial={false}
+            animate={{
+              opacity: showBackToTop ? 1 : 0,
+              y: showBackToTop ? 0 : 12,
+              pointerEvents: showBackToTop ? "auto" : "none",
+            }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            <span aria-hidden="true">↑</span>
+          </motion.button>
         </div>
       </Router>
     </MotionConfig>

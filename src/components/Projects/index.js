@@ -1,20 +1,8 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FaExternalLinkAlt, FaGithub } from "react-icons/fa";
 import { content, projects } from "../../data/portfolio";
 import SectionHeading from "../SectionHeading";
-
-const projectColumnClasses = [
-  "lg:col-span-7",
-  "lg:col-span-5",
-  "lg:col-span-4",
-  "lg:col-span-4",
-  "lg:col-span-4",
-  "lg:col-span-7",
-  "lg:col-span-5",
-  "lg:col-span-6",
-  "lg:col-span-6",
-];
 
 function updateSpotlight(event) {
   const card = event.currentTarget;
@@ -72,28 +60,67 @@ export default function Projects({ onProjectSelect }) {
             </button>
           ))}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-12">
+        <motion.div layout className="grid gap-4 sm:grid-cols-2 lg:grid-cols-12">
+          <AnimatePresence mode="popLayout">
           {visibleProjects.map((project, index) => (
             <motion.article
               key={project.id}
-              className={`glass-panel spotlight-card rounded-3xl p-4 ${projectColumnClasses[index]}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ duration: 0.48, delay: (index % 3) * 0.08 }}
+              layout
+              data-cursor-view
+              className={`glass-panel spotlight-card rounded-3xl p-4 ${
+                index === 0 ? "lg:col-span-12" : "lg:col-span-6"
+              } ${index === 0 ? "lg:grid lg:grid-cols-[1.35fr_0.65fr] lg:gap-5" : ""}`}
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.38, delay: (index % 4) * 0.05 }}
               onMouseMove={updateSpotlight}
               onMouseLeave={resetSpotlight}
+              onClick={() => onProjectSelect(project)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onProjectSelect(project);
+                }
+              }}
+              role="link"
+              tabIndex={0}
             >
-              <div className="overflow-hidden rounded-2xl bg-[var(--page-raised)]">
-                <img
-                  src={project.image}
-                  alt={`${project.title} project preview`}
-                  className="aspect-[1.62] w-full object-cover transition-transform duration-500 hover:scale-[1.035]"
-                  loading="lazy"
-                  decoding="async"
-                />
+              <div className="group/project relative overflow-hidden rounded-2xl bg-[var(--page-raised)]">
+                {project.thumbnail === "ai-bot" ? (
+                  <div
+                    className="ai-bot-preview aspect-video"
+                    role="img"
+                    aria-label="AI Mail Bot dashboard preview"
+                  >
+                    <div className="ai-bot-orb" aria-hidden="true" />
+                    <div className="ai-bot-window">
+                      <span className="ai-bot-dot ai-bot-dot-red" />
+                      <span className="ai-bot-dot ai-bot-dot-yellow" />
+                      <span className="ai-bot-dot ai-bot-dot-green" />
+                      <div className="ai-bot-lines">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={project.image}
+                    alt={`${project.title} project preview`}
+                    className="aspect-video w-full object-cover transition-transform duration-500 group-hover/project:scale-[1.055]"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
+                <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/55 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover/project:opacity-100">
+                  <span className="rounded-full border border-white/20 bg-black/45 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
+                    Open preview
+                  </span>
+                </div>
               </div>
-              <div className="px-1 pb-1 pt-5">
+              <div className="px-1 pb-1 pt-5 lg:flex lg:flex-col lg:justify-center">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-lg font-semibold leading-snug tracking-tight">
                     {project.title}
@@ -107,8 +134,11 @@ export default function Projects({ onProjectSelect }) {
                 </p>
                 <button
                   type="button"
-                  className="mt-3 text-xs font-semibold text-[var(--accent-strong)] transition hover:opacity-75"
-                  onClick={() => onProjectSelect(project)}
+                  className="project-pill mt-3"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onProjectSelect(project);
+                  }}
                 >
                   {content.projects.detailsLabel}
                 </button>
@@ -122,11 +152,11 @@ export default function Projects({ onProjectSelect }) {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-5 flex gap-4 border-t border-[var(--line)] pt-4 text-xs font-medium text-[var(--muted)]">
+                <div className="mt-5 flex flex-wrap gap-2 border-t border-[var(--line)] pt-4">
                   {project.github && (
                     <a
                       href={project.github}
-                      className="inline-flex items-center gap-2 transition hover:text-[var(--accent-strong)]"
+                      className="project-pill"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -136,7 +166,7 @@ export default function Projects({ onProjectSelect }) {
                   {project.webapp && (
                     <a
                       href={project.webapp}
-                      className="inline-flex items-center gap-2 transition hover:text-[var(--accent-strong)]"
+                      className="project-pill"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -146,7 +176,7 @@ export default function Projects({ onProjectSelect }) {
                   {project.backendGithub && (
                     <a
                       href={project.backendGithub}
-                      className="inline-flex items-center gap-2 transition hover:text-[var(--accent-strong)]"
+                      className="project-pill"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -156,7 +186,7 @@ export default function Projects({ onProjectSelect }) {
                   {project.backendUrl && (
                     <a
                       href={project.backendUrl}
-                      className="inline-flex items-center gap-2 transition hover:text-[var(--accent-strong)]"
+                      className="project-pill"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -168,7 +198,8 @@ export default function Projects({ onProjectSelect }) {
               </div>
             </motion.article>
           ))}
-        </div>
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

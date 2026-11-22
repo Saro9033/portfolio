@@ -1,6 +1,6 @@
 import { useMotionValue, useSpring, motion } from "framer-motion";
 
-export default function MagneticLink({ children, className, href, ...props }) {
+export default function MagneticLink({ children, className, href, as = "a", ...props }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const springX = useSpring(x, { stiffness: 220, damping: 18, mass: 0.2 });
@@ -18,9 +18,11 @@ export default function MagneticLink({ children, className, href, ...props }) {
     y.set(0);
   };
 
+  const Component = as === "button" ? motion.button : motion.a;
+
   return (
-    <motion.a
-      href={href}
+    <Component
+      {...(as === "a" ? { href } : {})}
       className={className}
       style={{ x: springX, y: springY }}
       onPointerMove={handlePointerMove}
@@ -28,6 +30,6 @@ export default function MagneticLink({ children, className, href, ...props }) {
       {...props}
     >
       {children}
-    </motion.a>
+    </Component>
   );
 }
